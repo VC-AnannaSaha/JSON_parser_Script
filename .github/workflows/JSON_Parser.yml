@@ -1,0 +1,30 @@
+name: trigger sil test executio n
+# Workflow Trigger # button hinzufügen # Executed by Powershell
+# Like Macro: ${{env replaces upfront bat code which gets exeecuted
+# $env:<Variable> Sets a env variable
+on:
+  workflow_dispatch
+  #push:
+    #branches: ["main"]
+# Configuration of the environment
+env:
+  # https://github.com/vibracoustic-syseng/ECAS_MBPD_Test_Dev/tree/main/SIL/Automation/TestExecution.bat
+  #  VARIABLEN
+  BatFilePath: "SIL/Automation/TestExecution.bat"
+  ScriptFilePath: "SIL/Automation/parser_tpt_results.py"
+jobs:
+  # Call Test Execution bat file
+  Call:
+    runs-on: [windows-latest] #[self-hosted, Windows] #SIL_1/2
+    steps: # "-" declares a new step pattern wihtout declaring further with "step" keyword
+      - name: Checkout Test Dev Repo content
+        uses: actions/checkout@v4
+        # Not required, per default repo in which we are acting is implict applied
+        #with:
+        #submodules: 'false'
+        #token: ${{ secrets.BUILD_ACTION_PAT }} # for external repos
+        #path: ProdCod
+      - name: Call test execution bat file # only informative
+        run: "${{env.BatFilePath}}"
+      - name: Parsing test summaries and pushing results to json file
+        run: python "${{env.ScriptFilePath}}"
